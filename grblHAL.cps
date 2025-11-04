@@ -12,6 +12,8 @@
 
 /*
 Add change notes here!!!! DO NOT FORGET OR YOU WILL FORGET
+12.08.25
+1. Added Option to enable/disable arc generation
 
 18.02.25
 1. Improved return position behaviour and code generation
@@ -53,7 +55,7 @@ maximumCircularRadius = spatial(1000, MM);
 minimumCircularSweep = toRad(0.01);
 maximumCircularSweep = toRad(180);
 allowHelicalMoves = true;
-allowedCircularPlanes = undefined; // (1 << PLANE_XY) | (1 << PLANE_ZX) | (1 << PLANE_YZ) - allow any circular motion
+allowedCircularPlanes = 0; // (1 << PLANE_XY) | (1 << PLANE_ZX) | (1 << PLANE_YZ) - allow any circular motion
 
 // user-defined properties
 properties = {
@@ -282,10 +284,17 @@ properties = {
     value: true,
     scope: "post"
   },
+  useCircularInterpolation: {
+    title      : "Disable G2/G3 Arcs",
+    description: "Disable output of G2 and G3 Arc commands.\nUses linear circular interpolation instead.",
+    type       : "boolean",
+    value      : true,
+    scope      : "post"
+  }
 };
 
 groupDefinitions = {
- Safety: {title: "Saftey Settings", description: "Settings for safe operation", collapsed: false, order:5},
+ Safety: {title: "Safety Settings", description: "Settings for safe operation", collapsed: false, order:5},
  Coolant: {title: "Coolant Mapping", description: "Define Machinecodes for Coolant", collapsed: true, order:25}
 };
 
@@ -415,7 +424,9 @@ function onOpen() {
     setMachineConfiguration(machineConfiguration);
     optimizeMachineAngles2(1); // TCP mode
   }*/
-
+  if (getProperty("useCircularInterpolation")) {
+    allowedCircularPlanes = undefined; // Allow circular interpolation in all three planes
+  }
   if (getProperty("fourthAxisAround") != "none") {
     var aAxis = createAxis({
       coordinate:0,
@@ -1728,3 +1739,10 @@ function setWorkPlane(abc) {
   setCurrentABC(abc); // required for machine simulation
 }
 // <<<<< INCLUDED FROM ../common/grbl.cps
+
+
+
+
+
+
+
