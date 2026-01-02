@@ -3,6 +3,12 @@ Experimental grblHAL post processor with canned cycles and 4th axis support for 
 
 Added features and modifications:
 
+1.2.2025
+
+1. Fixed bug where multi-axis toolpaths would ignore rotary axis machine definition.
+2. Added experimental support for inverse time feed to maintain constant tool engagement during multi-axis machining.
+
+
 12.08.2025
 
 Added the ability to enable/disable arc generation in outputted code to prevent the following error in IOsender when using Gcode Rotate. This option is heavily affected by (Built-in) Tolerance value
