@@ -424,22 +424,31 @@ function onOpen() {
     setMachineConfiguration(machineConfiguration);
     optimizeMachineAngles2(1); // TCP mode
   }*/
-  if (getProperty("useCircularInterpolation")) {
-    allowedCircularPlanes = undefined; // Allow circular interpolation in all three planes
-  }
   if (getProperty("fourthAxisAround") != "none") {
-    var aAxis = createAxis({
-      coordinate:0,
-      table:getProperty("fourthAxisIsTable"),
-      axis:[(getProperty("fourthAxisAround") == "x" ? 1 : 0), (getProperty("fourthAxisAround") == "y" ? 1 : 0), 0],
-      cyclic:true,
-      range: [0,360],
-      preference:0
-    });
-    machineConfiguration = new MachineConfiguration(aAxis);
+    // Determine if X or Y is selected based on the menu property
+    var axisVector = (getProperty("fourthAxisAround") == "x") ? [1, 0, 0] : [0, 1, 0];
 
+    // Create the axis. 
+    // NOTE: We force 'table:true' because Lathe Mode requires the part to spin.
+    // We removed 'range' to allow infinite winding (Lathe behavior).
+    var aAxis = createAxis({
+      coordinate: 0, 
+      table: true, 
+      axis: axisVector, 
+      cyclic: true, 
+      preference: 0
+    });
+    
+    machineConfiguration = new MachineConfiguration(aAxis);
     setMachineConfiguration(machineConfiguration);
-    optimizeMachineAngles2(1); // map tip mode
+    
+    // Enable Wrapping Optimization
+    optimizeMachineAngles2(1); 
+
+    // Enable Inverse Time (G93) for smooth rotation
+    machineConfiguration.setMultiAxisFeedrate(
+      FEED_INVERSE_TIME, 9999.99, INVERSE_MINUTES, 0.001, 1.0
+    );
   }
 
   if (getProperty("AirWhileMist") && getProperty("airOn") == "") {
@@ -1707,7 +1716,7 @@ function setFeedrateMode(reset) {
     tcpIsSupported ? FEED_FPM : FEED_INVERSE_TIME,
     9999.99, // maximum output value for inverse time feed rates
     INVERSE_MINUTES, // can be INVERSE_SECONDS or DPM_COMBINATION for DPM feeds
-    0.5, // tolerance to determine when the DPM feed has changed
+    0.001, // tolerance to determine when the DPM feed has changed
     1.0 // ratio of rotary accuracy to linear accuracy for DPM calculations
   );
   if (!receivedMachineConfiguration || (revision < 45765)) {
@@ -1739,7 +1748,6 @@ function setWorkPlane(abc) {
   setCurrentABC(abc); // required for machine simulation
 }
 // <<<<< INCLUDED FROM ../common/grbl.cps
-
 
 
 
