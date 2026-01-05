@@ -12,6 +12,10 @@
 
 /*
 Add change notes here!!!! DO NOT FORGET OR YOU WILL FORGET
+1.2.2025
+Fixed bug where multi-axis toolpaths would ignore rotary axis machine definition.
+Added experimental support for inverse time feed to maintain constant tool engagement during multi-axis machining.
+
 12.08.25
 1. Added Option to enable/disable arc generation
 
@@ -1748,6 +1752,7 @@ function setWorkPlane(abc) {
   setCurrentABC(abc); // required for machine simulation
 }
 // <<<<< INCLUDED FROM ../common/grbl.cps
+
 
 
 
